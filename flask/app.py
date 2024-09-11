@@ -10,7 +10,7 @@ import asyncio
 app = Flask(__name__)
 
 # Configure Gemini API
-os.environ["API_KEY"] = "AIzaSyAq9ro3j2APQL0VrPWhveWdteiCn9rbFFE"  # Gantilah dengan API key Anda
+os.environ["API_KEY"] = "YOUR_API_KEY"  # Gantilah dengan API key Anda
 genai.configure(api_key=os.environ["API_KEY"])
 model_name = "ogi"
 model_role = "Asisten Virtual Berbasis AI untuk Menjawab Pertanyaan dalam Bahasa Indonesia"
