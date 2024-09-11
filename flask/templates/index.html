@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Assistant - Speech to Text to Speech</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        audio {
+            margin-top: 20px;
+        }
+
+        .question, .response {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Klaris Virtual Assistant</h1>
+        
+        <button onclick="startRecording()">Start Recording</button>
+        
+        <p id="status">Press the button and speak...</p>
+        
+        <!-- Menampilkan pertanyaan pengguna -->
+        <p class="question" id="question"></p>
+        
+        <!-- Menampilkan respons dari AI -->
+        <p class="response" id="response"></p>
+        
+        <audio id="audio" controls></audio>
+    </div>
+
+    <script>
+        function startRecording() {
+            document.getElementById("status").textContent = "Listening...";
+            
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("status").textContent = "Error: " + data.error;
+                } else {
+                    // Menampilkan pertanyaan yang diinput oleh pengguna
+                    document.getElementById("question").textContent = "User: " + data.user_question;
+
+                    // Menampilkan respons dari AI
+                    document.getElementById("response").textContent = "Response: " + data.response;
+
+                    // Memutar audio dengan respons dari AI
+                    const audio = document.getElementById("audio");
+                    audio.src = data.audio_file;
+                    audio.play();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
