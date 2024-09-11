@@ -21,12 +21,25 @@ async def text_to_speech(text, lang='id'):
     audio_path = os.path.join('static', 'audio')
     if not os.path.exists(audio_path):
         os.makedirs(audio_path)  # Buat direktori jika belum ada
-    audio_file_path = os.path.join(audio_path, 'output.mp3')
+
+    # Beri nama unik untuk setiap file audio dengan menggunakan timestamp
+    unique_filename = f"output_{int(time.time())}.mp3"
+    audio_file_path = os.path.join(audio_path, unique_filename)
     
     communicate = edge_tts.Communicate(text, voice="id-ID-ArdiNeural")
     await communicate.save(audio_file_path)
     
+    # Hapus file audio lama jika ada
+    clear_old_audio_files(audio_path)
+    
     return audio_file_path  # Return the relative path to the file
+
+# Function to clear old audio files in the directory
+def clear_old_audio_files(directory):
+    files = os.listdir(directory)
+    if len(files) > 1:
+        for file in files[:-1]:  # Delete all except the latest file
+            os.remove(os.path.join(directory, file))
 
 # Function for speech-to-text using SpeechRecognition
 def speech_to_text():

@@ -92,9 +92,9 @@
                     // Menampilkan respons dari AI
                     document.getElementById("response").textContent = "Response: " + data.response;
 
-                    // Memutar audio dengan respons dari AI
+                    // Memutar audio dengan respons dari AI dan hindari caching dengan menambahkan timestamp
                     const audio = document.getElementById("audio");
-                    audio.src = data.audio_file;
+                    audio.src = data.audio_file + '?t=' + new Date().getTime();  // Tambahkan query parameter untuk menghindari caching
                     audio.play();
                 }
             })
