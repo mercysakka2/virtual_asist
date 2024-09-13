@@ -5,12 +5,15 @@ import speech_recognition as sr
 import tempfile
 import edge_tts
 import asyncio
+import time
+import noisereduce as nr
+import numpy as np
 
 # Flask app initialization
 app = Flask(__name__)
 
 # Configure Gemini API
-os.environ["API_KEY"] = "YOUR_API_KEY"  # Gantilah dengan API key Anda
+os.environ["API_KEY"] = "AIzaSyAq9ro3j2APQL0VrPWhveWdteiCn9rbFFE"  # Gantilah dengan API key Anda
 genai.configure(api_key=os.environ["API_KEY"])
 model_name = "ogi"
 model_role = "Asisten Virtual Berbasis AI untuk Menjawab Pertanyaan dalam Bahasa Indonesia"
@@ -50,6 +53,34 @@ def speech_to_text():
     try:
         text = recognizer.recognize_google(audio, language="id-ID")
         return text
+    except sr.UnknownValueError:
+        return None
+    except sr.RequestError as e:
+        return None
+
+# Function for speech-to-text using SpeechRecognition with noise reduction
+def speech_to_text():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        # Adjust for ambient noise to reduce background noise
+        recognizer.adjust_for_ambient_noise(source, duration=1)
+        print("Silakan bicara...")
+        audio = recognizer.listen(source)
+
+    try:
+        # Convert the audio to an array format for processing
+        audio_data = np.frombuffer(audio.get_raw_data(), np.int16)
+
+        # Apply noise reduction
+        reduced_noise_audio = nr.reduce_noise(y=audio_data, sr=source.SAMPLE_RATE)
+
+        # Convert back to AudioData format after noise reduction
+        reduced_audio = sr.AudioData(reduced_noise_audio.tobytes(), source.SAMPLE_RATE, audio.sample_width)
+
+        # Recognize the speech
+        text = recognizer.recognize_google(reduced_audio, language="id-ID")
+        return text
+
     except sr.UnknownValueError:
         return None
     except sr.RequestError as e:
